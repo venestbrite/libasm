@@ -1,0 +1,178 @@
+Assembly viene utilizzato perché ha performance più elevate rispetto ad altri linguaggi, i suoi programmi sono più compatti, vi è un maggiore sfruttamento delle caratteristiche della macchina e consente l’accesso completo a tutte le risorse del computer. Un’istruzione in linguaggio macchina risulta direttamente leggibile dalla CPU, in quanto non ha bisogno di traduzioni. Attualmente Assembly viene adoperato per realizzare piccoli moduli altamente efficienti (sistemi operativi).
+SINTASSI
+[labels]  istruzioni  [operatori]  [commenti]
+La prima parte di un programma in assembly è il nome dell’istruzione (comando mnemonico) che deve essere eseguita, la seconda sono gli operatori o i parametri del comando
+; = commenti
+section .data = questa sezione è usata per dichiarare variabili inizializzate o costanti. Questi dati non cambieranno
+Section .text = questo sezione è usata per il vero e proprio codice
+ISTRUZIONI
+Mov x, y = copia il contenuto della sorgente nella destinazione
+Xchg = scambia il contenuto degli operandi (bisogna fare una sorta di swap con i registri)
+Xor = usare lo xor di un operando con se stesso cambia l’operando a 0, si usa per pulire un registro
+Cmp = compara i due operandi che gli vengono passati
+Push = mette qualcosa in memoria
+Pop = recupera il dato
+Jmp = viene inserita un’etichetta dove il continuo del codice è immediatamente trasferito 
+Jne = torna continuamente all'etichetta indicata finché non è uguale a 0
+Jnz = salta se non è 0
+Jz = salta se 0 
+Je = salta se i due operandi sono uguali
+Add = aggiunge il contenuto di src al contenuto di dst, lasciando il risultato in dst
+Sub = sottrae il contenuto di src al contenuto di dst, lasciando il risultato in dst
+Inc = aggiunge 1 all’operando
+Dec = toglie 1 dall'operando
+Db = guarda paragrafo variabili
+REGISTRI
+Registri a 64 bits:
+Rax = volatile
+Rbx = non-volatile
+Rcx = volatile
+Rdx = volatile
+Rsi = non-volatile
+Rdi = non-volatile
+Registri a 32 bits:
+Eax = è un registro con due principali utilizzi: memorizzare il valore di ritorno di una funzione e come registro speciale per determinati calcoli. Il valore non viene preservato. Il suo valore è impostato sul valore di ritorno di una funzione prima che una funzione ritorni. Eax viene anche utilizzato specificamente in alcuni calcoli, come la moltiplicazione e la divisione, come registro speciale
+Ebx = è un registro non volatile. Non ha un utilizzo specifico, ma è spesso impostato su un valore comunemente usato (come 0) in una funzione per velocizzare i calcoli.
+Ecx = è un registro volatile, viene utilizzato come parametro in una funzione o come contatore in un loop.
+Edx = è un registro, viene usato per memorizzare variabili a breve termine in una funzione.
+Esi = registro non-volatile spesso usato come puntatore. Esi spesso immagazzina dati che vengono usati attraverso la funzione poiché non vengono cambiati. Esi punta alla “source”.
+Edi = registro non-volatile spesso usato come puntatore. Al contrario di esi, punta alla “dest”.
+Registri a 16 bits:
+Ax
+bx
+Cx
+Dx
+Si
+Di
+Registri ad 8 bits:
+Al
+Bl
+Cl
+Dl
+Sil
+Dil
+VARIABILI
+section .data = comando per inizializzare le variabili
+[nome variabile] define-directive initial value
+define-directive = riservano un determinato spazio per le variabili
+ Directive Scopo Spazio riservato DBdefine byte1 byte DW define word2 bytes DD define double word 4 bytes DQ define quadword 8 bytes DT define ten bytes 10 bytes
+Esempio:
+choice     DB       ‘y’
+number    DW     12345
+La directive TIMES permette inizializzazioni multiple dello stesso valore. 
+Esempio:
+section  .data
+stars  times  9  DB  ‘*’ 
+Ha come output: *********
+FT_STRLEN
+section .text          (inizio del programma)
+      global _ft_strlen        (linko la funzione)
+_ft_strlen:        (prima funzione)
+    xor rax, rax         (inizializzo rax a 0, in questo modo pulisco il registro) (i = 0)
+     jmp till_0        (vado direttamente alla funzione till_0) 
+increment:        (seconda funzione)
+     inc rax         (incremento rax) (i++)
+till_0:        (terza funzione)
+  cmp BYTE[rdi + rax], 0         (finché la “dest” più rax non arriva a 0) (while(s[i]))
+   jne increment      (finché non è uguale a 0 torna alla funzione increment) 
+end:        (funzione finale)
+  ret         (ritorno di rax) (return (i))
+FT_STRCPY   
+section .text          (inizio del programma)
+      global _ft_strcpy        (linko la funzione)
+_ft_strcpy:        (prima funzione)
+     xor rax, rax        (pulisco il registro)
+    xor rcx, rcx         (pulisco il registro)
+    xor rdx, rdx         (pulisco il registro)
+     cmp rsi, 0        (controllo se rsi(la mia temporanea che punta alla source) è 0)
+     jz end         (se è 0, va alla fine)         
+      jmp till_0     (altrimenti vai alla funzione till_0)
+increment:        (seconda funzione)
+     inc rcx        (incremento rcx, che è come se fosse la mia i)
+till_0:        (terza funzione)
+     mov dl, BYTE[rsi + rcx]        (sposto nel registro più piccolo, un byte alla volta, la source in posizione i)
+     mov BYTE[rdi + rcx], dl        (sposto in rdi(il mio puntatore alla dest), un byte alla volta, tutto quello che è dentro il mio registro dl)
+     cmp dl, 0        (controllo se dl è 0)
+     jnz increment        (se non è 0 torno alla funzione increment)
+end:        (funzione finale)
+     mov rax, rdi        (sposto tutto dalla dest al registro di ritorno)
+      ret  
+FT_STRCMP
+section .text
+     global _ft_strcmp   
+_ft_strcmp:        (prima funzione)
+    xor rax, rax         (pulisco il registro)
+      xor rcx, rcx        (pulisco il registro)
+     xor rdx, rdx        (pulisco il registro)
+     cmp rsi, 0        (controllo che la source esista)
+     jz is_zero        (se non esiste salto alla funzione is_zero)
+     cmp rdi, 0        (controllo che la dest esista)
+      jz is_zero        (se non esiste salto alla funzione is_zero)
+compare:        (seconda funzione)
+     mov dl, BYTE[rsi + rcx]        (sposto byte per byte tutto quello che è in posizione rsi + rcx nel registro più piccolo)
+     cmp dl, BYTE[rdi + rcx]        (controllo se il carattere della dest e quello della source sono uguali)
+     jne sub        (se non sono uguali rimanda alla funzione sub)
+increment:        (terza funzione)
+    inc rcx        (incremento rcx)
+not_exist:        (quarta funzione)
+     cmp BYTE[rdi + rcx], 0        (controllo che la dest esista ancora)
+     je sub                             (se non esiste va alla funzione sub)
+     cmp BYTE[rsi + rcx], 0        (controllo che la source esista ancora)
+     je sub                             (se non esiste va alla funzione sub)
+     jmp compare                    (se entrambe esistono ancora torna alla funzione compare)
+sub:           (quinta funzione)
+      mov dl, BYTE[rdi + rcx]         (sposto byte per byte tutto quello che è in posizione rdi + rcx nel registro più piccolo)
+     sub dl, BYTE[rsi + rcx]        (sottraggo al carattere della dest quello della source)
+     cmp dl, 0                       (controllo che il registro non sia uguale a 0)
+    jb less                          (se è un unsigned int ed è minore di 0 va alla funzione less)
+     jl less                            (se è un int ed è minore di 0 va alla funzione less)
+     jz is_zero                       (se è uguale a 0 va alla funzione is_zero)
+     ja greater                       (se è un unsigned int ed è maggiore di 0 va alla funzione greater)
+     jg greater                       (se è un int ed è maggiore di 0 va alla funzione greater)
+greater:        (sesta funzione)
+     mov rax, 1        (sposta 1 in rax)
+     ret                 (ritorna 1)
+less:           (settima funzione)
+     mov rax, -1        (sposta -1 in rax)
+     ret                    (ritorna -1)
+is_zero:        (ottava funzione)
+     mov rax, 0        (sposta 0 in rax)
+      ret                 (ritorna 0)
+FT_WRITE
+section .text
+     global _ft_write
+_ft_write:        (prima funzione)
+     mov rax, 0x2000004        (sposto in rax la chiamata a sistema di write che corrisponde al valore 0x2000004) 
+      syscall                    (faccio la chiamata a sistema)
+     jc error                    (se la carry flag è usual a 1 va all funzione errore)
+     ret                          (ritorna il valore di rax)
+error:           (seconda funzione)
+     mov rax, -1        (sposto in rax il valore -1)
+     ret                 (ritorno -1)
+FT_READ         (uguale ad ft_write, cambia solo il numero della chiamata a sistema)
+section .text
+     global _ft_read
+_ft_read:
+      mov rax, 0x2000003         
+      syscall
+     jc error
+     ret
+error:
+     mov rax, -1
+     ret 
+FT_STRDUP
+section .text
+     global _ft_strdup
+    extern _ft_strlen        (mi vado a prendere la funzione strlen)
+     extern _ft_strcpy        (mi vado a prendere la funzione strcpy)
+     extern _malloc           (mi vado a prendere la funzione malloc)
+_ft_strdup:         
+     call _ft_strlen        (mi richiamo la funzione strlen)
+     push rdi              (attacco il valore della strlen al puntatore alla dest)
+     mov rdi, rax           (sposto il valore)
+     call _malloc        (mi richiamo il malloc)
+     pop rdx              (tolgo il valore della strlen da rdx)
+     mov rdi, rax         
+     mov rsi, rdx
+     call _ft_strcpy        (mi richiamo lo strcpy)
+      ret

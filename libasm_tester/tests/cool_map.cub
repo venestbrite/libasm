@@ -1,0 +1,15 @@
+R  800 400
+NO ./textures/wooden_fire_512.xpm
+SO ./textures/wooden_fire_512.xpm
+WE ./textures/wooden_fire_512.xpm
+EA ./textures/wooden_fire_512.xpm
+S  ./textures/fratm.png
+F 0,255,0
+C 255,0,0
+
+111111111111111
+100000000000001
+10000000N0000001
+1002000200200001
+10000000000000001
+11111111111111111

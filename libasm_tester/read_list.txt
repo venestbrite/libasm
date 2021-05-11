@@ -1,0 +1,13 @@
+argument_list.txt
+cool_map.cub
+destroyer.sh
+invalid_map_area_004.cub
+invalid_map_area_010.cub
+invalid_map_area_013.cub
+invalid_map_area_017.cub
+invalid_res_008.cub
+libasm.txt
+map
+map_png.cub
+test1.txt
+test2.txt
